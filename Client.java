@@ -1,101 +1,101 @@
-name import java.awt.event.ActionEvent;
-name import java.awt.event.ActionListener;
-name import java.io.EOFException;
-name import java.io.IOException;
-name import java.io.ObjectInputStream;
-name import java.io.ObjectOutputStream;
-name import java.net.InetAddress;
-name import java.net.Socket;
-name import javax.swing.JFrame;
-name import javax.swing.JScrollPane;
-name import javax.swing.JTextArea;
-name import javax.swing.JTextField;
-name import javax.swing.SwingUtilities;
-name 
-name public class Client
-name   extends JFrame
-name {
-name   private JTextField userText;
-name   private JTextArea chatWindow;
-name   private ObjectOutputStream output;
-name   private ObjectInputStream input;
+ import java.awt.event.ActionEvent;
+ import java.awt.event.ActionListener;
+ import java.io.EOFException;
+ import java.io.IOException;
+ import java.io.ObjectInputStream;
+ import java.io.ObjectOutputStream;
+ import java.net.InetAddress;
+ import java.net.Socket;
+ import javax.swing.JFrame;
+ import javax.swing.JScrollPane;
+ import javax.swing.JTextArea;
+ import javax.swing.JTextField;
+ import javax.swing.SwingUtilities;
+ 
+ public class Client
+   extends JFrame
+ {
+   private JTextField userText;
+   private JTextArea chatWindow;
+   private ObjectOutputStream output;
+   private ObjectInputStream input;
    private String message = "";
-name   private String serverIP;
-name   private Socket connection;
-name   
-name   public Client(String paramString)
-name   {
+   private String serverIP;
+   private Socket connection;
+   
+   public Client(String paramString)
+   {
      super("Crypto Instant Messenger");
      this.serverIP = paramString;
      this.userText = new JTextField();
      this.userText.setEditable(false);
      this.userText.addActionListener(new ActionListener()
-name     {
-name       public void actionPerformed(ActionEvent paramAnonymousActionEvent)
-name       {
+     {
+       public void actionPerformed(ActionEvent paramAnonymousActionEvent)
+       {
          Client.this.sendMessage(paramAnonymousActionEvent.getActionCommand());
          Client.this.userText.setText("");
-name       }
+       }
      });
      add(this.userText, "North");
      this.chatWindow = new JTextArea();
      add(new JScrollPane(this.chatWindow), "Center");
      setSize(300, 150);
      setVisible(true);
-name   }
-name   
-name   public void startRunningClient()
-name   {
-name     try
-name     {
+   }
+   
+   public void startRunningClient()
+   {
+     try
+     {
        connectToServer();
        setupStreams();
        whileChatting();
-name     }
-name     catch (EOFException localEOFException)
-name     {
+     }
+     catch (EOFException localEOFException)
+     {
        showMessage("\nClient terminated the connection.");
-name     }
-name     catch (IOException localIOException)
-name     {
+     }
+     catch (IOException localIOException)
+     {
        localIOException.printStackTrace();
-name     }
-name     finally
-name     {
+     }
+     finally
+     {
        closeEverything();
-name     }
-name   }
-name   
-name   private void connectToServer()
-name     throws IOException
-name   {
+     }
+   }
+   
+   private void connectToServer()
+     throws IOException
+   {
      showMessage("Attempting to connect to server: " + this.serverIP + "\n");
-     this.connection = new Socket(InetAddress.getByName(this.serverIP), 6789);
-     showMessage("Connected to: " + this.connection.getInetAddress().getHostName());
-name   }
-name   
-name   private void setupStreams()
-name     throws IOException
-name   {
+     this.connection = new Socket(InetAddress.getBy(this.serverIP), 6789);
+     showMessage("Connected to: " + this.connection.getInetAddress().getHost());
+   }
+   
+   private void setupStreams()
+     throws IOException
+   {
      this.output = new ObjectOutputStream(this.connection.getOutputStream());
      this.output.flush();
      this.input = new ObjectInputStream(this.connection.getInputStream());
      showMessage("\nYour streams are up and running.\n");
-name   }
-name   
-name   private void whileChatting()
-name     throws IOException
-name   {
+   }
+   
+   private void whileChatting()
+     throws IOException
+   {
      ableToType(true);
-name     do
-name     {
-name       try
-name       {
+     do
+     {
+       try
+       {
          this.message = ((String)this.input.readObject());
          showMessage("\n" + this.message);
-name       }
-name       catch (ClassNotFoundException localClassNotFoundException)
-name       {
+       }
+       catch (ClassNotFoundException localClassNotFoundException)
+       {
          showMessage("\nUnknown incoming data type!");
        }
      } while (!this.message.equals("SERVER - END"));
