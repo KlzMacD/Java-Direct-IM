@@ -1,4 +1,4 @@
-GitTest
+Java-Direct-IM
 =======
 My first commit to GitHub through Git.
 
